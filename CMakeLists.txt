@@ -3,7 +3,6 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-add_subdirectory("ext/fmt")
 add_subdirectory("ext/glfw")
 add_subdirectory("ext/glm")
 
@@ -17,7 +16,7 @@ project ("chk_software")
 
 # Add source to this project's executable.
 add_executable (chk_software "src/chk_software.cpp" "src/chk_software.h" "src/chk_common.h" "src/chk_common.cpp")
-target_link_libraries (chk_software fmt::fmt glm::glm glfw)
+target_link_libraries (chk_software glm::glm glfw)
 
 # Enable the new preprocessor so we are std20 compliant
 if(MSVC)
