@@ -4,19 +4,25 @@
 #include <string>
 #include <string_view>
 #include <source_location>
+#include <stdexcept>
 
 namespace chk {
 
 	namespace dbg {
-		void print(std::string_view sender, std::string_view msg, const std::source_location location = std::source_location::current());
-		void print_args(std::string_view sender, std::string_view format, std::format_args args, const std::source_location location = std::source_location::current());
+		struct log_format_string {
+			std::string_view str;
+			std::source_location loc;
 
-		void log(std::string_view msg, const std::source_location location = std::source_location::current());
-		void warn(std::string_view msg, const std::source_location location = std::source_location::current());
-		void error(std::string_view msg, const std::source_location location = std::source_location::current());
+			log_format_string(const char* str, const std::source_location& loc = std::source_location::current()) : str(str), loc(loc) {}
+		};
 
-		template <typename... Ts> void log(std::string_view sender, const std::format_string<Ts...> format, Ts&&... args, const std::source_location location = std::source_location::current()) { chk::dbg::print_args("  LOG  ", format, std::make_format_args(args...), location); }
-		template <typename... Ts> void warn(std::string_view sender, const std::format_string<Ts...> format, Ts&&... args, const std::source_location location = std::source_location::current()) { chk::dbg::print_args("WARNING", format, std::make_format_args(args...), location); }
-		template <typename... Ts> void error(std::string_view sender, const std::format_string<Ts...> format, Ts&&... args, const std::source_location location = std::source_location::current()) { chk::dbg::print_args("ERROR", format, std::make_format_args(args...), location); }
+		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args args);
+		std::string internal_fmt(const std::string_view sender, const log_format_string& format, std::format_args args);
+		void internal_error_print(const std::string_view msg);
+
+		template<typename... Ts> void log(const std::string_view sender, const log_format_string& format, Ts&&... args) { internal_log(sender, format, std::make_format_args(args...)); }
+		template<typename... Ts> void print(const log_format_string& format, Ts&&... args) { internal_log("  LOG  ", format, std::make_format_args(args...)); }
+		template<typename... Ts> void warn(const log_format_string& format, Ts&&... args) { internal_log("WARNING", format, std::make_format_args(args...)); }
+		template<typename... Ts> void error(const log_format_string& format, Ts&&... args) { auto msg = internal_fmt(" ERROR ", format, std::make_format_args(args...)); internal_error_print(msg); throw std::runtime_error(msg); }
 	}
 }

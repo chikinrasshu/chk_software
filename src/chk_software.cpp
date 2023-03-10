@@ -2,9 +2,7 @@
 
 int main()
 {
-	chk::dbg::log("This is a log");
-	chk::dbg::warn("This is an warning!");
-	chk::dbg::error("This is an error!");
+	auto window = chk::Window({ 800, 600 }, "chk_software renderer");
 
-	return 0;
+	return window.run();
 }
