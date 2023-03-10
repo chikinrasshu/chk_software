@@ -5,12 +5,14 @@
 
 namespace chk {
 	namespace dbg {
-		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args args) {
+		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args&& args) {
 			const auto& loc = format.loc;
-			std::cout << "[" << sender << "]: " << loc.file_name() << ": " << loc.function_name() << "(" << loc.line() << ") => " << format.str << std::endl;
+			auto msg = std::string();
+			std::vformat_to(std::back_inserter(msg), format.str, args);
+			std::cout << "[" << sender << "]: " << loc.file_name() << ": " << loc.function_name() << "(" << loc.line() << ") => " << msg << std::endl;
 		}
 
-		std::string internal_fmt(const std::string_view sender, const log_format_string& format, std::format_args args)
+		std::string internal_fmt(const std::string_view sender, const log_format_string& format, std::format_args&& args)
 		{
 			const auto& loc = format.loc;
 

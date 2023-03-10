@@ -5,6 +5,7 @@
 #include <string_view>
 #include <source_location>
 #include <stdexcept>
+#include <iostream>
 
 namespace chk {
 
@@ -16,8 +17,8 @@ namespace chk {
 			log_format_string(const char* str, const std::source_location& loc = std::source_location::current()) : str(str), loc(loc) {}
 		};
 
-		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args args);
-		std::string internal_fmt(const std::string_view sender, const log_format_string& format, std::format_args args);
+		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args&& args);
+		std::string internal_fmt(const std::string_view sender, const log_format_string& format, std::format_args&& args);
 		void internal_error_print(const std::string_view msg);
 
 		template<typename... Ts> void log(const std::string_view sender, const log_format_string& format, Ts&&... args) { internal_log(sender, format, std::make_format_args(args...)); }
