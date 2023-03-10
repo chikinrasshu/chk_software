@@ -15,7 +15,7 @@ endif()
 project ("chk_software")
 
 # Add source to this project's executable.
-add_executable (chk_software "src/chk_software.cpp" "src/chk_software.h" "src/chk_common.h" "src/chk_common.cpp" "src/chk_window.h" "src/chk_window.cpp")
+add_executable (chk_software "src/chk_software.cpp" "src/chk_software.h" "src/chk_common.h" "src/chk_common.cpp" "src/chk_window.h" "src/chk_window.cpp" "src/chk_math.h")
 target_link_libraries (chk_software glm::glm glfw)
 
 # Enable the new preprocessor so we are std20 compliant

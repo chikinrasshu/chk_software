@@ -1,8 +1,7 @@
 #pragma once
 
 #include "chk_common.h"
-
-#include <glm/vec2.hpp>
+#include "chk_math.h"
 
 #include <functional>
 
@@ -30,6 +29,13 @@ namespace chk {
 		[[nodiscard]] bool is_focused() const { return m_is_focused; }
 		[[nodiscard]] bool is_fullscreen() const { return m_is_fullscreen; }
 		
+		[[nodiscard]] bool size_changed() const{ return m_size_changed; }
+		[[nodiscard]] bool fb_size_changed() const{ return m_fb_size_changed; }
+		[[nodiscard]] bool pos_changed() const{ return m_pos_changed; }
+		[[nodiscard]] bool dpi_changed() const{ return m_dpi_changed; }
+		[[nodiscard]] bool focus_changed() const{ return m_focus_changed; }
+		[[nodiscard]] bool fullscreen_changed() const{ return m_fullscreen_changed; }
+
 		// Position
 		[[nodiscard]] int x() const { return m_pos.x; }
 		[[nodiscard]] int y() const { return m_pos.y; }
@@ -54,12 +60,22 @@ namespace chk {
 		[[nodiscard]] GLFWwindow* handle() const { return m_handle; }
 
 	private:
+		// State
 		bool m_is_running{ false };
 		bool m_is_maximized{ false };
 		bool m_is_minimized{ false };
 		bool m_is_focused{ false };
 		bool m_is_fullscreen{ false };
 
+		// State changes
+		bool m_size_changed{ false };
+		bool m_fb_size_changed{ false };
+		bool m_pos_changed{ false };
+		bool m_dpi_changed{ false };
+		bool m_focus_changed{ false };
+		bool m_fullscreen_changed{ false };
+
+		// Transform
 		glm::ivec2 m_pos{ 0,0 };
 		glm::ivec2 m_size{ 0,0 };
 		glm::ivec2 m_fb_size{ 0,0 };
