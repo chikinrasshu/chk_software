@@ -5,7 +5,8 @@
 
 namespace chk {
 	namespace dbg {
-		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args&& args) {
+		void internal_log(const std::string_view sender, const log_format_string& format, std::format_args&& args) 
+		{
 			const auto& loc = format.loc;
 			auto msg = std::string();
 			std::vformat_to(std::back_inserter(msg), format.str, args);
@@ -24,7 +25,8 @@ namespace chk {
 			return msg;
 		}
 
-		void internal_error_print(const std::string_view msg) {
+		void internal_error_print(const std::string_view msg) 
+		{
 			std::cerr << msg;
 			std::fflush(stderr);
 		}
