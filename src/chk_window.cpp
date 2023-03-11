@@ -9,6 +9,10 @@ namespace chk
 
 	Window::Window(const glm::ivec2& size, const std::string& caption) {
 		internal_register_window();
+
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
 		m_handle = glfwCreateWindow(size.x, size.y, caption.data(), nullptr, nullptr);
 		if (!m_handle) { dbg::error("Failed to create the main window!"); internal_release_window(); }
 
@@ -31,6 +35,10 @@ namespace chk
 		glfwSetWindowFocusCallback(m_handle, s_cb_windowfocusfun);
 		glfwSetWindowContentScaleCallback(m_handle, s_cb_windowcontentscalefun);
 
+		glfwGetWindowPos(m_handle, &m_pos.x, &m_pos.y);
+		glfwGetWindowSize(m_handle, &m_size.x, &m_size.y);
+		glfwGetFramebufferSize(m_handle, &m_fb_size.x, &m_fb_size.y);
+
 		m_is_running = true;
 	}
 
@@ -48,7 +56,7 @@ namespace chk
 			m_last_time = m_current_time;
 
 			if (!is_running()) { return false; }
-			if (m_frame_cb) { dbg::print("Calling the frame cb because of run!"); m_frame_cb(); }
+			if (m_frame_cb) { m_frame_cb(); }
 
 			if (m_size_changed) { m_size_changed = false; }
 			if (m_fb_size_changed) { m_fb_size_changed = false; }
@@ -74,7 +82,7 @@ namespace chk
 	void Window::s_cb_windowposfun(GLFWwindow* handle, int x, int y) { CHK_GET_WIN; win->m_pos = { x, y }; win->m_pos_changed = true; }
 	void Window::s_cb_windowsizefun(GLFWwindow* handle, int width, int height) { CHK_GET_WIN; win->m_size = { width, height }; win->m_size_changed = true; }
 	void Window::s_cb_framebuffersizefun(GLFWwindow* handle, int width, int height) { CHK_GET_WIN; win->m_fb_size = { width, height }; win->m_fb_size_changed = true; }
-	void Window::s_cb_windowrefreshfun(GLFWwindow* handle) { CHK_GET_WIN; if (win->m_frame_cb) { dbg::print("Calling the frame cb because of refresh!"); win->m_frame_cb(); } }
+	void Window::s_cb_windowrefreshfun(GLFWwindow* handle) { CHK_GET_WIN; if (win->m_frame_cb) { win->m_frame_cb(); } }
 	void Window::s_cb_windowclosefun(GLFWwindow* handle) { CHK_GET_WIN; win->m_is_running = false; }
 	void Window::s_cb_windowiconifyfun(GLFWwindow* handle, int minimized) { CHK_GET_WIN; win->m_is_minimized = !!(minimized); }
 	void Window::s_cb_windowmaximizefun(GLFWwindow* handle, int maximized) { CHK_GET_WIN; win->m_is_maximized = !!(maximized); }
