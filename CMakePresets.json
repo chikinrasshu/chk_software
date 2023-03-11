@@ -1,4 +1,4 @@
-﻿{
+{
     "version": 3,
     "configurePresets": [
         {
@@ -95,6 +95,18 @@
                 "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
                     "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
                 }
+            }
+        },
+        {
+            "name": "GCC M1",
+            "displayName": "GCC 12.2.0 aarch64-apple-darwin22",
+            "description": "Using compilers: C = /opt/homebrew/bin/aarch64-apple-darwin22-gcc-12, CXX = /opt/homebrew/bin/aarch64-apple-darwin22-g++-12",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/opt/homebrew/bin/aarch64-apple-darwin22-gcc-12",
+                "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/aarch64-apple-darwin22-g++-12",
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         }
     ]
