@@ -8,7 +8,7 @@ int main()
 	auto command_list = CommandList();
 
 	return window.run(
-		[&window]()
+		[&window, &command_list]()
 		{
 			if (window.size_changed())
 			{
@@ -17,7 +17,7 @@ int main()
 
 			command_list.clear();
 
-			command_list.push_line();
-			command_list.push_quad();
+			command_list.push_line({5, 7}, {16, 3}, colors::pink);
+			command_list.push_rect({32, 7}, {8, 12}, colors::red);
 		});
 }

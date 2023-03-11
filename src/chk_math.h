@@ -4,6 +4,8 @@
 #include "chk_dbg.h"
 
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 // Include printing helpers for (i,d)vec(2,3,4)
 template <glm::length_t L, typename T, enum glm::qualifier Q>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fmt/core.h>
+#include "chk_common.h"
 
 namespace chk
 {
