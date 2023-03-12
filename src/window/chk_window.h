@@ -1,7 +1,7 @@
 #pragma once
 
-#include "chk_common.h"
-#include "chk_math.h"
+#include "../common/chk_common.h"
+#include "../common/chk_math.h"
 
 #include <functional>
 
@@ -15,14 +15,16 @@ namespace chk
 	class Window
 	{
 	public:
-		Window(const glm::ivec2 &size, const std::string &caption = "chk_software");
+		Window(const glm::ivec2 &size, const std::string &caption = "chk_software", bool uses_opengl = false);
 		~Window();
 
 		// Non Copyable
-		Window(const Window &) = delete;
-		Window &operator=(const Window &) = delete;
+		CHK_NON_COPYABLE(Window);
 
+		bool recreate(bool uses_opengl = false);
+		bool show();
 		bool run(chk::callback frame_cb = nullptr);
+		bool swap_buffers();
 
 		[[nodiscard]] bool is_running() const { return m_is_running; }
 		[[nodiscard]] bool is_maximized() const { return m_is_maximized; }
@@ -59,6 +61,7 @@ namespace chk
 
 		// Internals
 		[[nodiscard]] GLFWwindow *handle() const { return m_handle; }
+		[[nodiscard]] bool uses_opengl() const { return m_uses_opengl; }
 
 	private:
 		// State
@@ -83,9 +86,11 @@ namespace chk
 		glm::vec2 m_dpi{1, 1};
 
 		// Internals
-		GLFWwindow *m_handle{nullptr};
-		callback m_frame_cb{nullptr};
+		GLFWwindow *m_handle;
+		std::string m_caption;
+		callback m_frame_cb{ nullptr };
 		double m_current_time{0}, m_last_time{0}, m_delta_time{0};
+		bool m_uses_opengl{ false };
 
 		// Callbacks
 		static void s_cb_keyfun(GLFWwindow *handle, int key, int scancode, int action, int mods);

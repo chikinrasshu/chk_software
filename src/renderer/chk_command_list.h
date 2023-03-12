@@ -1,8 +1,7 @@
 #pragma once
 
-#include "chk_common.h"
-#include "chk_dbg.h"
-#include "chk_math.h"
+#include "../common/chk_common.h"
+#include "../common/chk_math.h"
 
 #include <vector>
 
@@ -11,6 +10,8 @@ namespace chk
 	struct Command {
 		explicit Command(const glm::vec4& color = glm::vec4{ 1,1,1,1 }) : color(color) {}
 		
+		CHK_NON_COPYABLE(Command);
+
 		// Getters
 		// glm::vec4 aabb() = 0;
 
@@ -22,6 +23,8 @@ namespace chk
 		LineCommand(const glm::vec2& p0, const glm::vec2& p1, const glm::vec4& color = glm::vec4{ 1,1,1,1 })
 			: Command(color), p0(p0), p1(p1) {}
 
+		CHK_NON_COPYABLE(LineCommand);
+
 		// Members
 		glm::vec2 p0, p1;
 	};
@@ -29,6 +32,8 @@ namespace chk
 	struct TriangleCommand : public Command {
 		TriangleCommand(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec4& color = glm::vec4{ 1,1,1,1 })
 			: Command(color), p0(p0), p1(p1), p2(p2) {}
+
+		CHK_NON_COPYABLE(TriangleCommand);
 
 		// Members
 		glm::vec2 p0, p1, p2;
@@ -38,6 +43,8 @@ namespace chk
 		QuadCommand(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3, const glm::vec4& color = glm::vec4{ 1,1,1,1 })
 			: Command(color), p0(p0), p1(p1), p2(p2), p3(p3) {}
 
+		CHK_NON_COPYABLE(QuadCommand);
+
 		// Members
 		glm::vec2 p0, p1, p2, p3;
 	};
@@ -45,6 +52,8 @@ namespace chk
 	struct RectCommand : public Command {
 		RectCommand(const glm::vec2& pos, const glm::vec2& size, const glm::vec4 color = glm::vec4{ 1,1,1,1 })
 			: Command(color), pos(pos), size(size) {}
+
+		CHK_NON_COPYABLE(RectCommand);
 
 		// Members
 		glm::vec2 pos, size;
@@ -55,9 +64,7 @@ namespace chk
 		CommandList() = default;
 		~CommandList() = default;
 
-		// Non copyable
-		CommandList(const CommandList&) = delete;
-		CommandList& operator=(CommandList&) = delete;
+		CHK_NON_COPYABLE(CommandList);
 
 		// Getters
 		inline void clear() { return m_commands.clear(); }

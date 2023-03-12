@@ -1,6 +1,7 @@
 #include "chk_window.h"
-#include "chk_dbg.h"
+#include "../common/chk_dbg.h"
 
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 namespace chk
@@ -9,12 +10,24 @@ namespace chk
 	void internal_register_window();
 	void internal_release_window();
 
-	Window::Window(const glm::ivec2 &size, const std::string &caption)
+	Window::Window(const glm::ivec2 &size, const std::string &caption, bool uses_opengl)
+		: m_size(size), m_fb_size(size), m_caption(caption), m_uses_opengl(uses_opengl)
 	{
 		internal_register_window();
 
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		if (m_uses_opengl) {
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		}
+		else {
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		}
+
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+		// glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 		m_handle = glfwCreateWindow(size.x, size.y, caption.data(), nullptr, nullptr);
 		if (!m_handle)
@@ -46,6 +59,14 @@ namespace chk
 		glfwGetWindowSize(m_handle, &m_size.x, &m_size.y);
 		glfwGetFramebufferSize(m_handle, &m_fb_size.x, &m_fb_size.y);
 
+		if (m_uses_opengl) {
+			glfwMakeContextCurrent(m_handle);
+			if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress))) {
+				dbg::error("Failed to initialize OpenGL!");
+			}
+			else { dbg::print("Loaded OpenGL"); }
+		}
+
 		m_is_running = true;
 	}
 
@@ -58,55 +79,62 @@ namespace chk
 		}
 	}
 
+	bool Window::recreate(bool uses_opengl) {
+		try {
+			glm::ivec2 saved_size = m_size;
+			std::string saved_caption = m_caption;
+
+			dbg::print("Recreating the window {} an OpenGL context...", uses_opengl ? "with" : "without");
+			this->~Window();
+			new(&*this) Window(saved_size, saved_caption, uses_opengl);
+			return true;
+		}
+		catch (const std::exception& e) { dbg::error("{}", e.what()); }
+	}
+
+	bool Window::show() {
+		if (!m_handle) { return false; }
+		glfwShowWindow(m_handle);
+		return true;
+	}
+
 	bool Window::run(chk::callback frame_cb)
 	{
 		m_frame_cb = frame_cb;
 
 		glfwSetTime(0.0);
 		m_current_time = m_last_time = glfwGetTime();
+		if (!show()) { return false; }
 		while (!glfwWindowShouldClose(m_handle))
 		{
 			glfwPollEvents();
 			m_current_time = glfwGetTime();
-			m_delta_time = m_current_time - m_last_time;
+			m_delta_time = (m_current_time - m_last_time) * 1000.0f;
 			m_last_time = m_current_time;
 
-			if (!is_running())
-			{
-				return false;
-			}
-			if (m_frame_cb)
-			{
-				m_frame_cb();
-			}
+			std::string title;
+			fmt::format_to(std::back_inserter(title), "{} :: dt: {:.4f} :: fps: {:.2f}", m_caption, m_delta_time, 1000.0f / m_delta_time);
 
-			if (m_size_changed)
-			{
-				m_size_changed = false;
-			}
-			if (m_fb_size_changed)
-			{
-				m_fb_size_changed = false;
-			}
-			if (m_pos_changed)
-			{
-				m_pos_changed = false;
-			}
-			if (m_dpi_changed)
-			{
-				m_dpi_changed = false;
-			}
-			if (m_focus_changed)
-			{
-				m_focus_changed = false;
-			}
-			if (m_fullscreen_changed)
-			{
-				m_fullscreen_changed = false;
-			}
+			glfwSetWindowTitle(m_handle, title.c_str());
+
+			if (!is_running()) { return false; }
+			if (m_frame_cb) { m_frame_cb(); }
+
+			m_size_changed = false;
+			m_fb_size_changed = false;
+			m_pos_changed = false;
+			m_dpi_changed = false;
+			m_focus_changed = false;
+			m_fullscreen_changed = false;
 		}
 
 		return is_running();
+	}
+
+	bool Window::swap_buffers() {
+		if (!uses_opengl()) { return false; }
+		glfwSwapBuffers(m_handle);
+		return true;
 	}
 
 	// GLFW Callbacks

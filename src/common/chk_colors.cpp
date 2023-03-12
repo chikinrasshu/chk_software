@@ -18,5 +18,16 @@ namespace chk {
 		glm::vec4 tan = rgba(233, 222, 187);
 		glm::vec4 pink = rgba(255, 205, 243);
 		glm::vec4 white = rgba(255, 255, 255);
+
+
+		uint32_t packed_bgra(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+			uint32_t rgba = (a << 24) | (r << 16) | (g << 8) | b;
+			return rgba;
+		}
+
+		uint32_t packed_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+			uint32_t rgba = (a << 24) | (b << 16) | (g << 8) | r;
+			return rgba;
+		}
 	}
 }

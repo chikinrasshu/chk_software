@@ -13,6 +13,7 @@ namespace chk
         std::string internal_fmt(const fmt::string_view sender, const fmt::string_view format, fmt::format_args &&args)
         {
             std::string msg;
+            fmt::format_to(std::back_inserter(msg), "[{}]: ", sender);
             fmt::vformat_to(std::back_inserter(msg), format, args);
             return msg;
         }
@@ -20,6 +21,7 @@ namespace chk
         void internal_error_print(const fmt::string_view msg)
         {
             fmt::println(stderr, msg);
+            fflush(stderr);
         }
 
     }

@@ -6,6 +6,8 @@
 namespace chk {
 	namespace colors {
 		constexpr glm::vec4 rgba(float r, float g, float b, float a = 255.0f) { return glm::vec4{ r / 255.0f ,g / 255.0f,b / 255.0f,a / 255.0f }; }
+		uint32_t packed_bgra(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
+		uint32_t packed_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
 
 		extern glm::vec4 black;
 		extern glm::vec4 dark_gray;

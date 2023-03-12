@@ -7,3 +7,6 @@
 [submodule "ext/fmt"]
 	path = ext/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "ext/glad"]
+	path = ext/glad
+	url = https://github.com/Dav1dde/glad

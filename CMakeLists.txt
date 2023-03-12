@@ -6,26 +6,7 @@ project("chk_software")
 
 add_subdirectory("ext")
 
-# Add source to this project's executable.
-add_executable(chk_software
-  "src/chk_colors.cpp"
-  "src/chk_colors.h" 
-  "src/chk_command_list.h" 
-  "src/chk_common.cpp"
-  "src/chk_common.h"
-  "src/chk_dbg.cpp"
-  "src/chk_dbg.h"
-  "src/chk_math.h"
-  "src/chk_software.cpp"
-  "src/chk_software.h"
-  "src/chk_window.cpp"
-  "src/chk_window.h" 
-)
-
-target_link_libraries(chk_software glm::glm fmt::fmt glfw)
-target_compile_features(chk_software PUBLIC cxx_std_17)
-
-
+# Visual Studio Specific stuff
 if (MSVC)
 	# Enable Hot Reload for MSVC compilers if supported.
 	if (POLICY CMP0141)
@@ -34,8 +15,33 @@ if (MSVC)
 	endif()
 	
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MTd /Zi /Ob0 /Od /RTC1")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Ob0 /Od /RTC1")
 	endif()
 endif()
+
+# Add source to this project's executable.
+add_executable(chk_software
+  "cpp.hint"
+  "src/chk_software.cpp"
+  "src/chk_software.h"
+  "src/common/chk_colors.cpp"
+  "src/common/chk_colors.h" 
+  "src/common/chk_common.cpp"
+  "src/common/chk_common.h"
+  "src/common/chk_dbg.cpp"
+  "src/common/chk_dbg.h"
+  "src/common/chk_math.h"
+  "src/renderer/chk_bitmap.cpp"
+  "src/renderer/chk_bitmap.h" 
+  "src/renderer/chk_command_list.h" 
+  "src/renderer/chk_renderer.h" 
+  "src/soft/chk_soft_renderer.h"
+  "src/window/chk_window.cpp"
+  "src/window/chk_window.h" 
+ "src/soft/chk_soft_renderer.cpp"
+ "src/soft/chk_opengl.h" "src/soft/chk_opengl.cpp")
+
+target_link_libraries(chk_software glm::glm fmt::fmt glfw glad_gl_core_41)
+target_compile_features(chk_software PUBLIC cxx_std_17)
 
 # TODO: Add tests and install targets if needed.
