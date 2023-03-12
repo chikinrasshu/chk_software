@@ -7,30 +7,30 @@ namespace chk
 	{
 
 		const char *vert_shader_source = R""""(
-#version 410 core
-layout (location = 0) in vec2 position;
-layout (location = 1) in vec2 texCoord;
-out vec2 fragTexCoord;
+			#version 410 core
+			layout (location = 0) in vec2 position;
+			layout (location = 1) in vec2 texCoord;
+			out vec2 fragTexCoord;
 
-void main()
-{
-	gl_Position = vec4(position, 0.0, 1.0);
-	fragTexCoord = texCoord;
-}
-)"""";
+			void main()
+			{
+				gl_Position = vec4(position, 0.0, 1.0);
+				fragTexCoord = texCoord;
+			}
+		)"""";
 
 		const char *frag_shader_source = R""""(
-#version 410 core
-uniform sampler2D tex;
-in vec2 fragTexCoord;
-out vec4 fragColor;
+			#version 410 core
+			uniform sampler2D tex;
+			in vec2 fragTexCoord;
+			out vec4 fragColor;
 
-void main()
-{
-	vec3 uvdebug = vec3(fragTexCoord, 0);
-	fragColor = vec4(texture(tex, fragTexCoord).rgb + 0.1*uvdebug, 1);
-}
-)"""";
+			void main()
+			{
+				vec3 uvdebug = vec3(fragTexCoord, 0);
+				fragColor = vec4(texture(tex, fragTexCoord).rgb + 0.1*uvdebug, 1);
+			}
+		)"""";
 
 		constexpr GLfloat fs_side = 1.0f;
 		static const GLfloat fs_quad_vertices[] = {
