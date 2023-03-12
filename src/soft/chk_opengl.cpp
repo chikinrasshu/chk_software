@@ -173,7 +173,7 @@ namespace chk
 			glBindVertexArray(gl.vao);
 
 			dbg::print(" - Vertex Buffer Object");
-			glGenBuffers(std::size(gl.vbos), gl.vbos);
+			glGenBuffers(static_cast<GLsizei>(std::size(gl.vbos)), gl.vbos);
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[0]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(fs_quad_vertices), fs_quad_vertices, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[1]);
