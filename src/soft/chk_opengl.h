@@ -4,10 +4,13 @@
 
 #include <glad/gl.h>
 
-namespace chk {
-	namespace opengl {
+namespace chk
+{
+	namespace opengl
+	{
 
-		struct OpenGL {
+		struct OpenGL
+		{
 			GLuint vao;
 			GLuint vbos[2];
 			GLuint vert_shader, frag_shader, shader_program;
@@ -17,8 +20,8 @@ namespace chk {
 		};
 
 		OpenGL setup();
-		void update_viewport(OpenGL& gl, const glm::ivec2& pos, const glm::ivec2& size);
-		void update_tex(OpenGL& gl, const Bitmap& bitmap);
-		void draw(OpenGL& gl, const Bitmap& bitmap);
+		void update_viewport(OpenGL &gl, const glm::ivec2 &pos, const glm::ivec2 &size);
+		void update_tex(OpenGL &gl, const Bitmap &bitmap);
+		void draw(OpenGL &gl, const Bitmap &bitmap);
 	}
 }

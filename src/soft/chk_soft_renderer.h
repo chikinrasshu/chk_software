@@ -6,16 +6,17 @@
 
 namespace chk
 {
-	class SoftRenderer : public Renderer {
+	class SoftRenderer : public Renderer
+	{
 	public:
-		SoftRenderer(Window& window);
+		SoftRenderer(Window &window);
 		~SoftRenderer() = default;
 
-		CHK_NON_COPYABLE(SoftRenderer);
+		CHK_NON_COPYABLE_NON_MOVABLE(SoftRenderer);
 
 		void begin_frame();
 		void end_frame();
-		void render(CommandList& command_list);
+		void render(CommandList &command_list);
 		void present();
 
 	private:

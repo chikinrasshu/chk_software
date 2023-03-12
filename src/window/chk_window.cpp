@@ -15,14 +15,16 @@ namespace chk
 	{
 		internal_register_window();
 
-		if (m_uses_opengl) {
+		if (m_uses_opengl)
+		{
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		}
-		else {
+		else
+		{
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		}
 
@@ -59,12 +61,17 @@ namespace chk
 		glfwGetWindowSize(m_handle, &m_size.x, &m_size.y);
 		glfwGetFramebufferSize(m_handle, &m_fb_size.x, &m_fb_size.y);
 
-		if (m_uses_opengl) {
+		if (m_uses_opengl)
+		{
 			glfwMakeContextCurrent(m_handle);
-			if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress))) {
+			if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress)))
+			{
 				dbg::error("Failed to initialize OpenGL!");
 			}
-			else { dbg::print("Loaded OpenGL"); }
+			else
+			{
+				dbg::print("Loaded OpenGL");
+			}
 		}
 
 		m_is_running = true;
@@ -79,21 +86,30 @@ namespace chk
 		}
 	}
 
-	bool Window::recreate(bool uses_opengl) {
-		try {
+	bool Window::recreate(bool uses_opengl)
+	{
+		try
+		{
 			glm::ivec2 saved_size = m_size;
 			std::string saved_caption = m_caption;
 
 			dbg::print("Recreating the window {} an OpenGL context...", uses_opengl ? "with" : "without");
 			this->~Window();
-			new(&*this) Window(saved_size, saved_caption, uses_opengl);
+			new (&*this) Window(saved_size, saved_caption, uses_opengl);
 			return true;
 		}
-		catch (const std::exception& e) { dbg::error("{}", e.what()); }
+		catch (const std::exception &e)
+		{
+			dbg::error("{}", e.what());
+		}
 	}
 
-	bool Window::show() {
-		if (!m_handle) { return false; }
+	bool Window::show()
+	{
+		if (!m_handle)
+		{
+			return false;
+		}
 		glfwShowWindow(m_handle);
 		return true;
 	}
@@ -104,7 +120,10 @@ namespace chk
 
 		glfwSetTime(0.0);
 		m_current_time = m_last_time = glfwGetTime();
-		if (!show()) { return false; }
+		if (!show())
+		{
+			return false;
+		}
 		while (!glfwWindowShouldClose(m_handle))
 		{
 			glfwPollEvents();
@@ -117,8 +136,14 @@ namespace chk
 
 			glfwSetWindowTitle(m_handle, title.c_str());
 
-			if (!is_running()) { return false; }
-			if (m_frame_cb) { m_frame_cb(); }
+			if (!is_running())
+			{
+				return false;
+			}
+			if (m_frame_cb)
+			{
+				m_frame_cb();
+			}
 
 			m_size_changed = false;
 			m_fb_size_changed = false;
@@ -131,8 +156,12 @@ namespace chk
 		return is_running();
 	}
 
-	bool Window::swap_buffers() {
-		if (!uses_opengl()) { return false; }
+	bool Window::swap_buffers()
+	{
+		if (!uses_opengl())
+		{
+			return false;
+		}
 		glfwSwapBuffers(m_handle);
 		return true;
 	}

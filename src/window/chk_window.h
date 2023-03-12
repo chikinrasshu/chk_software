@@ -88,9 +88,9 @@ namespace chk
 		// Internals
 		GLFWwindow *m_handle;
 		std::string m_caption;
-		callback m_frame_cb{ nullptr };
+		callback m_frame_cb{nullptr};
 		double m_current_time{0}, m_last_time{0}, m_delta_time{0};
-		bool m_uses_opengl{ false };
+		bool m_uses_opengl{false};
 
 		// Callbacks
 		static void s_cb_keyfun(GLFWwindow *handle, int key, int scancode, int action, int mods);

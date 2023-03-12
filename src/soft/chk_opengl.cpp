@@ -1,10 +1,12 @@
 #include "chk_opengl.h"
 #include "../common/chk_dbg.h"
 
-namespace chk {
-	namespace opengl {
+namespace chk
+{
+	namespace opengl
+	{
 
-		const char* vert_shader_source =
+		const char *vert_shader_source =
 			"#version 410 core\n"
 			"layout (location = 0) in vec2 position;\n"
 			"layout (location = 1) in vec2 texCoord;\n"
@@ -15,7 +17,7 @@ namespace chk {
 			"    fragTexCoord = texCoord;\n"
 			"}\n";
 
-		const char* frag_shader_source =
+		const char *frag_shader_source =
 			"#version 410 core\n"
 			"uniform sampler2D tex;\n"
 			"in vec2 fragTexCoord;\n"
@@ -26,65 +28,104 @@ namespace chk {
 			"    fragColor = vec4(texture(tex, fragTexCoord).rgb + 0.1*uvdebug, 1);\n"
 			"}\n";
 
-		constexpr GLfloat fs_side = 0.9f;
+		constexpr GLfloat fs_side = 1.0f;
 		static const GLfloat fs_quad_vertices[] = {
 			-fs_side, -fs_side,
-			 fs_side, -fs_side,
-			-fs_side,  fs_side,
-			 fs_side,  fs_side
-		};
+			fs_side, -fs_side,
+			-fs_side, fs_side,
+			fs_side, fs_side};
 
 		static const GLfloat fs_quad_tex_coords[] = {
-			0.0f, 0.0f,
-			1.0f, 0.0f,
 			0.0f, 1.0f,
-			1.0f, 1.0f
-		};
+			1.0f, 1.0f,
+			0.0f, 0.0f,
+			1.0f, 0.0f};
 
-		void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+		void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+		{
 
 			auto src_name = "Unknown";
 			switch (source)
 			{
-				case GL_DEBUG_SOURCE_API:             src_name = "API"; break;
-				case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   src_name = "Window System"; break;
-				case GL_DEBUG_SOURCE_SHADER_COMPILER: src_name = "Shader Compiler"; break;
-				case GL_DEBUG_SOURCE_THIRD_PARTY:     src_name = "Third Party"; break;
-				case GL_DEBUG_SOURCE_APPLICATION:     src_name = "Application"; break;
-				case GL_DEBUG_SOURCE_OTHER:           src_name = "Other"; break;
+			case GL_DEBUG_SOURCE_API:
+				src_name = "API";
+				break;
+			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+				src_name = "Window System";
+				break;
+			case GL_DEBUG_SOURCE_SHADER_COMPILER:
+				src_name = "Shader Compiler";
+				break;
+			case GL_DEBUG_SOURCE_THIRD_PARTY:
+				src_name = "Third Party";
+				break;
+			case GL_DEBUG_SOURCE_APPLICATION:
+				src_name = "Application";
+				break;
+			case GL_DEBUG_SOURCE_OTHER:
+				src_name = "Other";
+				break;
 			}
 
 			auto type_name = "Unknown";
 			switch (type)
 			{
-				case GL_DEBUG_TYPE_ERROR:               type_name = "Error"; break;
-				case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: type_name = "Deprecated Behaviour"; break;
-				case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  type_name = "Undefined Behaviour"; break;
-				case GL_DEBUG_TYPE_PORTABILITY:         type_name = "Portability"; break;
-				case GL_DEBUG_TYPE_PERFORMANCE:         type_name = "Performance"; break;
-				case GL_DEBUG_TYPE_MARKER:              type_name = "Marker"; break;
-				case GL_DEBUG_TYPE_PUSH_GROUP:          type_name = "Push Group"; break;
-				case GL_DEBUG_TYPE_POP_GROUP:           type_name = "Pop Group"; break;
-				case GL_DEBUG_TYPE_OTHER:               type_name = "Other"; break;
+			case GL_DEBUG_TYPE_ERROR:
+				type_name = "Error";
+				break;
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+				type_name = "Deprecated Behaviour";
+				break;
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+				type_name = "Undefined Behaviour";
+				break;
+			case GL_DEBUG_TYPE_PORTABILITY:
+				type_name = "Portability";
+				break;
+			case GL_DEBUG_TYPE_PERFORMANCE:
+				type_name = "Performance";
+				break;
+			case GL_DEBUG_TYPE_MARKER:
+				type_name = "Marker";
+				break;
+			case GL_DEBUG_TYPE_PUSH_GROUP:
+				type_name = "Push Group";
+				break;
+			case GL_DEBUG_TYPE_POP_GROUP:
+				type_name = "Pop Group";
+				break;
+			case GL_DEBUG_TYPE_OTHER:
+				type_name = "Other";
+				break;
 			}
 
 			auto severity_name = "Unknown";
 			switch (severity)
 			{
-				case GL_DEBUG_SEVERITY_HIGH:         severity_name = "High"; break;
-				case GL_DEBUG_SEVERITY_MEDIUM:       severity_name = "Medium"; break;
-				case GL_DEBUG_SEVERITY_LOW:          severity_name = "Low"; break;
-				case GL_DEBUG_SEVERITY_NOTIFICATION: severity_name = "Notification"; break;
+			case GL_DEBUG_SEVERITY_HIGH:
+				severity_name = "High";
+				break;
+			case GL_DEBUG_SEVERITY_MEDIUM:
+				severity_name = "Medium";
+				break;
+			case GL_DEBUG_SEVERITY_LOW:
+				severity_name = "Low";
+				break;
+			case GL_DEBUG_SEVERITY_NOTIFICATION:
+				severity_name = "Notification";
+				break;
 			}
 
 			dbg::log("OPEN_GL", "Source: {}, Type: {}, Severity: {} =>", src_name, type_name, severity_name);
-			dbg::log("OPEN_GL", "\t - {}", fmt::string_view(reinterpret_cast<const char*>(message), static_cast<size_t>(length)));
+			dbg::log("OPEN_GL", "\t - {}", fmt::string_view(reinterpret_cast<const char *>(message), static_cast<size_t>(length)));
 		}
 
-		void check_shader_compilation(GLuint shader) {
+		void check_shader_compilation(GLuint shader)
+		{
 			GLint success;
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-			if (!success) {
+			if (!success)
+			{
 				GLchar info_log[512];
 				glGetShaderInfoLog(shader, static_cast<GLsizei>(std::size(info_log)), nullptr, info_log);
 
@@ -92,10 +133,12 @@ namespace chk {
 			}
 		}
 
-		void check_shader_linking(GLuint program) {
+		void check_shader_linking(GLuint program)
+		{
 			GLint success;
 			glGetProgramiv(program, GL_LINK_STATUS, &success);
-			if (!success) {
+			if (!success)
+			{
 				GLchar info_log[512];
 				glGetProgramInfoLog(program, static_cast<GLsizei>(std::size(info_log)), nullptr, info_log);
 
@@ -103,12 +146,16 @@ namespace chk {
 			}
 		}
 
-		OpenGL setup() {
+		OpenGL setup()
+		{
 			auto gl = OpenGL{};
 
 			dbg::print(" - Setup the debug callback");
-			glEnable(GL_DEBUG_OUTPUT);
-			glDebugMessageCallback(debug_callback, nullptr);
+			if (GLAD_GL_ARB_debug_output)
+			{
+				glEnable(GL_DEBUG_OUTPUT);
+				glDebugMessageCallback(debug_callback, nullptr);
+			}
 
 			dbg::print(" - Setup the fixed pipeline");
 			glEnable(GL_BLEND);
@@ -130,11 +177,11 @@ namespace chk {
 
 			dbg::print(" - Sending the Vertex Data");
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[0]);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
 			glEnableVertexAttribArray(0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[1]);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
 			glEnableVertexAttribArray(1);
 
 			dbg::print(" - Texture bindings");
@@ -159,28 +206,30 @@ namespace chk {
 			glShaderSource(gl.frag_shader, 1, &frag_shader_source, nullptr);
 			glCompileShader(gl.frag_shader);
 			check_shader_compilation(gl.frag_shader);
-			
+
 			dbg::print(" - Link both shaders with the program");
 			glAttachShader(gl.shader_program, gl.vert_shader);
 			glAttachShader(gl.shader_program, gl.frag_shader);
 			glLinkProgram(gl.shader_program);
 			check_shader_linking(gl.shader_program);
-			
+
 			dbg::print(" - We're done.");
 			glUseProgram(gl.shader_program);
 
-			//Get the Texture location and stuff
+			// Get the Texture location and stuff
 			gl.texture_location = glGetUniformLocation(gl.shader_program, "tex");
 			gl.texture_unit = 0;
 
 			return gl;
 		}
 
-		void update_viewport(OpenGL& gl, const glm::ivec2& pos, const glm::ivec2& size) {
+		void update_viewport(OpenGL &gl, const glm::ivec2 &pos, const glm::ivec2 &size)
+		{
 			glViewport(pos.x, pos.y, size.x, size.y);
 		}
 
-		void update_tex(OpenGL& gl, const Bitmap& bitmap) {
+		void update_tex(OpenGL &gl, const Bitmap &bitmap)
+		{
 			glActiveTexture(GL_TEXTURE0 + gl.texture_unit);
 			glBindTexture(GL_TEXTURE_2D, gl.texture);
 
@@ -188,15 +237,22 @@ namespace chk {
 			// glPixelStorei(GL_UNPACK_ROW_LENGTH, bitmap.stride());
 
 			auto format = GL_RGBA;
-			if (bitmap.bpp() != 4) { dbg::error("Unsupported bitmap bpp of {}!", bitmap.bpp()); }
+			if (bitmap.bpp() != 4)
+			{
+				dbg::error("Unsupported bitmap bpp of {}!", bitmap.bpp());
+			}
 
 			// dbg::print(" - Updating the texture with one of size {} at pixel {} of size {}", bitmap.size(), static_cast<void*>(bitmap.memory()), bitmap.memory_size());
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap.w(), bitmap.h(), 0, format, GL_UNSIGNED_BYTE, reinterpret_cast<const void*>(bitmap.memory()));
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap.w(), bitmap.h(), 0, format, GL_UNSIGNED_BYTE, reinterpret_cast<const void *>(bitmap.memory()));
 			// dbg::print(" - Done.");
 		}
 
-		void draw(OpenGL& gl, const Bitmap& bitmap) {
-			if (!gl.shader_program) { dbg::warn("Missing shader program!"); }
+		void draw(OpenGL &gl, const Bitmap &bitmap)
+		{
+			if (!gl.shader_program)
+			{
+				dbg::warn("Missing shader program!");
+			}
 			// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			// dbg::print(" - Update the texture with the new data");

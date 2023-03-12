@@ -6,19 +6,20 @@
 
 namespace chk
 {
-	class Renderer {
+	class Renderer
+	{
 	public:
-		Renderer(Window& window) : m_window{ window } {}
+		Renderer(Window &window) : m_window{window} {}
 		~Renderer() = default;
 
-		CHK_NON_COPYABLE(Renderer);
+		CHK_NON_COPYABLE_NON_MOVABLE(Renderer);
 
 		virtual void begin_frame() = 0;
 		virtual void end_frame() = 0;
-		virtual void render(CommandList& command_list) = 0;
+		virtual void render(CommandList &command_list) = 0;
 		virtual void present() = 0;
 
 	protected:
-		Window& m_window;
+		Window &m_window;
 	};
 }
