@@ -2,6 +2,7 @@
 #include "../common/chk_dbg.h"
 
 #include <glad/gl.h>
+
 #include <GLFW/glfw3.h>
 
 namespace chk
@@ -101,6 +102,7 @@ namespace chk
 		catch (const std::exception &e)
 		{
 			dbg::error("{}", e.what());
+			return false;
 		}
 	}
 
