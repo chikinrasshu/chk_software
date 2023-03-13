@@ -16,4 +16,10 @@ add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
 glad_add_library(glad_gl_core_41 REPRODUCIBLE API gl:core=4.1)
 
 # Add whereami
-add_subdirectory("whereami")
+add_library(whereami STATIC whereami/src/whereami.c whereami/src/whereami.h)
+target_include_directories(whereami PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/whereami/src)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/whereami/src/
+        DESTINATION include/
+        FILES_MATCHING PATTERN "*.h")
+
