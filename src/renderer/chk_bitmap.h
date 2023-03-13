@@ -10,19 +10,19 @@ namespace chk
 	class Bitmap
 	{
 	public:
-		Bitmap(const glm::ivec2 &size) { resize(size); }
+		Bitmap(const ivec2 &size) { resize(size); }
 		~Bitmap();
 
 		CHK_NON_COPYABLE(Bitmap);
 
 		// Helpers
-		void resize(const glm::ivec2 &size);
+		void resize(const ivec2 &size);
 		void clear();
 
 		// Getters
 		int w() const { return m_size.x; }
 		int h() const { return m_size.y; }
-		glm::ivec2 size() const { return m_size; }
+		ivec2 size() const { return m_size; }
 		size_t stride() const { return m_stride; }
 		size_t bpp() const { return m_bpp; }
 
@@ -30,7 +30,7 @@ namespace chk
 		uint8_t *memory() const { return m_memory; }
 
 	private:
-		glm::ivec2 m_size;
+		ivec2 m_size;
 		uint8_t *m_memory{nullptr};
 		size_t m_stride{0};
 		size_t m_bpp{4};

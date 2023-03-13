@@ -3,65 +3,83 @@
 #include "../common/chk_common.h"
 #include "../common/chk_math.h"
 
+#include <memory>
 #include <vector>
 
 namespace chk
 {
-	struct Command
+	enum class GraphicsCommandKind
 	{
-		explicit Command(const glm::vec4 &color = glm::vec4{1, 1, 1, 1}) : color(color) {}
-
-		CHK_NON_COPYABLE(Command);
-
-		// Getters
-		// glm::vec4 aabb() = 0;
-
-		// Members
-		glm::vec4 color;
+		Line,
+		Triangle,
+		Rect,
+		Quad,
+		Circle,
+		Ellipse
 	};
 
-	struct LineCommand : public Command
+	struct GraphicsCommand
 	{
-		LineCommand(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color = glm::vec4{1, 1, 1, 1})
-			: Command(color), p0(p0), p1(p1) {}
+		GraphicsCommand(const GraphicsCommandKind &kind, const vec4 &color = {1, 1, 1, 1}) : kind{kind}, color{color} {}
+		virtual ~GraphicsCommand() {}
 
-		CHK_NON_COPYABLE(LineCommand);
-
-		// Members
-		glm::vec2 p0, p1;
+		GraphicsCommandKind kind;
+		vec4 color;
 	};
 
-	struct TriangleCommand : public Command
+	struct LineCommand : GraphicsCommand
 	{
-		TriangleCommand(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color = glm::vec4{1, 1, 1, 1})
-			: Command(color), p0(p0), p1(p1), p2(p2) {}
+		LineCommand(const vec2 &p0, const vec2 &p1, const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Line, color}, p0{p0}, p1{p1} {}
+		~LineCommand() = default;
 
-		CHK_NON_COPYABLE(TriangleCommand);
-
-		// Members
-		glm::vec2 p0, p1, p2;
+		vec2 p0, p1;
 	};
 
-	struct QuadCommand : public Command
+	struct TriangleCommand : GraphicsCommand
 	{
-		QuadCommand(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec2 &p3, const glm::vec4 &color = glm::vec4{1, 1, 1, 1})
-			: Command(color), p0(p0), p1(p1), p2(p2), p3(p3) {}
+		TriangleCommand(const vec2 &p0, const vec2 &p1, const vec2 &p2, const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Triangle, color}, p0{p0}, p1{p1}, p2{p2} {}
+		~TriangleCommand() = default;
 
-		CHK_NON_COPYABLE(QuadCommand);
-
-		// Members
-		glm::vec2 p0, p1, p2, p3;
+		vec2 p0, p1, p2;
 	};
 
-	struct RectCommand : public Command
+	struct RectCommand : GraphicsCommand
 	{
-		RectCommand(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec4 color = glm::vec4{1, 1, 1, 1})
-			: Command(color), pos(pos), size(size) {}
+		RectCommand(const vec2 &pos, const vec2 &size, const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Rect, color}, pos{pos}, size{size} {}
+		~RectCommand() = default;
 
-		CHK_NON_COPYABLE(RectCommand);
+		vec2 pos, size;
+	};
 
-		// Members
-		glm::vec2 pos, size;
+	struct QuadCommand : GraphicsCommand
+	{
+		QuadCommand(const vec2 &p0, const vec2 &p1, const vec2 &p2, const vec2 &p3, const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Quad, color}, p0{p0}, p1{p1}, p2{p2}, p3{p3} {}
+		~QuadCommand() = default;
+
+		vec2 p0, p1, p2, p3;
+	};
+
+	struct CircleCommand : GraphicsCommand
+	{
+		CircleCommand(const vec2 &p, float r, const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Circle, color}, p{p}, r{r} {}
+		~CircleCommand() = default;
+
+		vec2 p;
+		float r;
+	};
+
+	struct EllipseCommand : GraphicsCommand
+	{
+		EllipseCommand(const vec2 &p0, const vec2 &p1, const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Ellipse, color}, p0{p0}, p1{p1} {}
+		~EllipseCommand() = default;
+
+		vec2 p0, p1;
 	};
 
 	class CommandList
@@ -69,26 +87,31 @@ namespace chk
 	public:
 		CommandList() = default;
 		~CommandList() = default;
+		CHK_NON_COPYABLE_NON_MOVABLE(CommandList);
 
-		CHK_NON_COPYABLE(CommandList);
+		void push_line(const vec2 &p0, const vec2 &p1, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<LineCommand>(p0, p1, c)); }
+		void push_triangle(const vec2 &p0, const vec2 &p1, const vec2 &p2, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<TriangleCommand>(p0, p1, p2, c)); }
+		void push_rect(const vec2 &pos, const vec2 &size, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<RectCommand>(pos, size, c)); }
+		void push_quad(const vec2 &p0, const vec2 &p1, const vec2 &p2, const vec2 &p3, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<QuadCommand>(p0, p1, p2, p3, c)); }
+		void push_circle(const vec2 &p, float r, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<CircleCommand>(p, r, c)); }
+		void push_circle(const vec2 &p0, const vec2 &p1, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<EllipseCommand>(p0, p1, c)); }
 
-		// Getters
-		inline void clear() { return m_commands.clear(); }
-		inline size_t size() { return m_commands.size(); }
-		inline std::vector<Command>::iterator begin() { return m_commands.begin(); }
-		inline std::vector<Command>::iterator end() { return m_commands.end(); }
+		void clear() { m_commands.clear(); }
+		size_t size() const { return m_commands.size(); }
 
-		// Commands
-		void push_line(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color = glm::vec4{1, 1, 1, 1}) { m_commands.emplace_back(LineCommand(p0, p1, color)); }
-		void push_triangle(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color = glm::vec4{1, 1, 1, 1}) { m_commands.emplace_back(TriangleCommand(p0, p1, p2, color)); }
-		void push_quad(const glm::vec2 p0, const glm::vec2 p1, const glm::vec2 p2, glm::vec2 p3, const glm::vec4 &color = glm::vec4{1, 1, 1, 1}) { m_commands.emplace_back(QuadCommand(p0, p1, p2, p3, color)); }
-		void push_rect(const glm::vec2 pos, const glm::vec2 size, const glm::vec4 &color = glm::vec4{1, 1, 1, 1}) { m_commands.emplace_back(RectCommand(pos, size, color)); }
-		// void push_circle();
-		// void push_ellipse();
-		// void push_polygon();
+		// Iterators
+		inline auto begin() { return m_commands.begin(); }
+		inline auto end() { return m_commands.end(); }
+		inline auto rbegin() { return m_commands.rbegin(); }
+		inline auto rend() { return m_commands.rend(); }
+
+		// Const Iterators
+		inline const auto begin() const { return m_commands.begin(); }
+		inline const auto end() const { return m_commands.end(); }
+		inline const auto rbegin() const { return m_commands.rbegin(); }
+		inline const auto rend() const { return m_commands.rend(); }
 
 	private:
-		// Members
-		std::vector<Command> m_commands{};
+		std::vector<std::unique_ptr<GraphicsCommand>> m_commands;
 	};
 }

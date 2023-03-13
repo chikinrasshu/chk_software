@@ -7,6 +7,22 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+// Typedef common math types
+namespace chk
+{
+	typedef glm::ivec2 ivec2;
+	typedef glm::ivec3 ivec3;
+	typedef glm::ivec4 ivec4;
+
+	typedef glm::dvec2 dvec2;
+	typedef glm::dvec3 dvec3;
+	typedef glm::dvec4 dvec4;
+
+	typedef glm::vec2 vec2;
+	typedef glm::vec3 vec3;
+	typedef glm::vec4 vec4;
+}
+
 // Include printing helpers for (i,d)vec(2,3,4)
 template <glm::length_t L, typename T, enum glm::qualifier Q>
 struct fmt::formatter<glm::vec<L, T, Q>>

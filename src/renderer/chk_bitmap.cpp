@@ -14,7 +14,7 @@ namespace chk
 		}
 	}
 
-	void Bitmap::resize(const glm::ivec2 &size)
+	void Bitmap::resize(const ivec2 &size)
 	{
 		// Only resize the memory if the size actually changed
 		bool size_changed = (size.x != m_size.x || size.y != m_size.y) || !m_memory;

@@ -228,7 +228,7 @@ namespace chk
 			return gl;
 		}
 
-		void update_viewport(OpenGL &gl, const glm::ivec2 &pos, const glm::ivec2 &size)
+		void update_viewport(OpenGL &gl, const ivec2 &pos, const ivec2 &size)
 		{
 			glViewport(pos.x, pos.y, size.x, size.y);
 		}

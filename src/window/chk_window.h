@@ -15,7 +15,7 @@ namespace chk
 	class Window
 	{
 	public:
-		Window(const glm::ivec2 &size, const std::string &caption = "chk_software", bool uses_opengl = false);
+		Window(const ivec2 &size, const std::string &caption = "chk_software", bool uses_opengl = false);
 		~Window();
 
 		// Non Copyable
@@ -42,22 +42,22 @@ namespace chk
 		// Position
 		[[nodiscard]] int x() const { return m_pos.x; }
 		[[nodiscard]] int y() const { return m_pos.y; }
-		[[nodiscard]] glm::ivec2 pos() const { return m_pos; }
+		[[nodiscard]] ivec2 pos() const { return m_pos; }
 
 		// Size
 		[[nodiscard]] int w() const { return m_size.x; }
 		[[nodiscard]] int h() const { return m_size.y; }
-		[[nodiscard]] glm::ivec2 size() const { return m_size; }
+		[[nodiscard]] ivec2 size() const { return m_size; }
 
 		// Framebuffer Size
 		[[nodiscard]] int fb_w() const { return m_fb_size.x; }
 		[[nodiscard]] int fb_h() const { return m_fb_size.y; }
-		[[nodiscard]] glm::vec2 fb_size() const { return m_fb_size; }
+		[[nodiscard]] vec2 fb_size() const { return m_fb_size; }
 
 		// DPI Scale
 		[[nodiscard]] float dpi_x() const { return m_dpi.x; }
 		[[nodiscard]] float dpi_y() const { return m_dpi.y; }
-		[[nodiscard]] glm::vec2 dpi() const { return m_dpi; }
+		[[nodiscard]] vec2 dpi() const { return m_dpi; }
 
 		// Internals
 		[[nodiscard]] GLFWwindow *handle() const { return m_handle; }
@@ -80,10 +80,10 @@ namespace chk
 		bool m_fullscreen_changed{false};
 
 		// Transform
-		glm::ivec2 m_pos{0, 0};
-		glm::ivec2 m_size{0, 0};
-		glm::ivec2 m_fb_size{0, 0};
-		glm::vec2 m_dpi{1, 1};
+		ivec2 m_pos{0, 0};
+		ivec2 m_size{0, 0};
+		ivec2 m_fb_size{0, 0};
+		vec2 m_dpi{1, 1};
 
 		// Internals
 		GLFWwindow *m_handle;

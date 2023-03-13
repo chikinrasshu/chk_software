@@ -2,8 +2,9 @@
 
 #include <fmt/core.h>
 
-#include <string>
+#include <memory>
 #include <stdexcept>
+#include <string>
 
 #define CHK_NON_COPYABLE(ClassName)                   \
 	ClassName(const ClassName &) = delete;            \

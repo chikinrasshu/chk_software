@@ -11,7 +11,7 @@ namespace chk
 	void internal_register_window();
 	void internal_release_window();
 
-	Window::Window(const glm::ivec2 &size, const std::string &caption, bool uses_opengl)
+	Window::Window(const ivec2 &size, const std::string &caption, bool uses_opengl)
 		: m_size(size), m_fb_size(size), m_caption(caption), m_uses_opengl(uses_opengl)
 	{
 		internal_register_window();
@@ -87,7 +87,7 @@ namespace chk
 
 	void Window::recreate(bool uses_opengl)
 	{
-		glm::ivec2 saved_size = m_size;
+		ivec2 saved_size = m_size;
 		std::string saved_caption = m_caption;
 
 		dbg::print("Recreating the window {} an OpenGL context...", uses_opengl ? "with" : "without");
