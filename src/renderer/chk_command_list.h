@@ -75,6 +75,8 @@ namespace chk
 		// Getters
 		inline void clear() { return m_commands.clear(); }
 		inline size_t size() { return m_commands.size(); }
+		inline std::vector<Command>::iterator begin() { return m_commands.begin(); }
+		inline std::vector<Command>::iterator end() { return m_commands.end(); }
 
 		// Commands
 		void push_line(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color = glm::vec4{1, 1, 1, 1}) { m_commands.emplace_back(LineCommand(p0, p1, color)); }

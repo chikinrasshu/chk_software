@@ -21,7 +21,7 @@ namespace chk
 		// Non Copyable
 		CHK_NON_COPYABLE(Window);
 
-		bool recreate(bool uses_opengl = false);
+		void recreate(bool uses_opengl = false);
 		bool show();
 		bool run(chk::callback frame_cb = nullptr);
 		bool swap_buffers();
@@ -89,7 +89,8 @@ namespace chk
 		GLFWwindow *m_handle;
 		std::string m_caption;
 		callback m_frame_cb{nullptr};
-		double m_current_time{0}, m_last_time{0}, m_delta_time{0};
+		double m_current_time{0}, m_last_time{0}, m_delta_time{0}, m_delta_ms{0};
+		double m_elapsed_timer{0};
 		bool m_uses_opengl{false};
 
 		// Callbacks

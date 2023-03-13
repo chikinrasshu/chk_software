@@ -17,6 +17,7 @@ namespace chk
 
 		// Helpers
 		void resize(const glm::ivec2 &size);
+		void clear();
 
 		// Getters
 		int w() const { return m_size.x; }

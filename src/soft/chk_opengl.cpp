@@ -154,32 +154,34 @@ namespace chk
 		{
 			auto gl = OpenGL{};
 
-			dbg::print(" - Setup the debug callback");
+			// - Setup the debug callback
 			if (GLAD_GL_ARB_debug_output)
 			{
 				glEnable(GL_DEBUG_OUTPUT);
 				glDebugMessageCallback(debug_callback, nullptr);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
 			}
 
-			dbg::print(" - Setup the fixed pipeline");
+			// - Setup the fixed pipeline
 			glEnable(GL_BLEND);
 			glEnable(GL_DEPTH_TEST);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 
-			dbg::print(" - Create the VAO and the VBOs");
+			// - Create the VAO and the VBOs
 			glGenVertexArrays(1, &gl.vao);
 			glBindVertexArray(gl.vao);
 
-			dbg::print(" - Vertex Buffer Object");
+			// - Vertex Buffer Object
 			glGenBuffers(static_cast<GLsizei>(std::size(gl.vbos)), gl.vbos);
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[0]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(fs_quad_vertices), fs_quad_vertices, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[1]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(fs_quad_tex_coords), fs_quad_tex_coords, GL_STATIC_DRAW);
 
-			dbg::print(" - Sending the Vertex Data");
+			// - Sending the Vertex Data
 			glBindBuffer(GL_ARRAY_BUFFER, gl.vbos[0]);
 			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
 			glEnableVertexAttribArray(0);
@@ -188,7 +190,7 @@ namespace chk
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
 			glEnableVertexAttribArray(1);
 
-			dbg::print(" - Texture bindings");
+			// - Texture bindings
 			glGenTextures(1, &gl.texture);
 			glBindTexture(GL_TEXTURE_2D, gl.texture);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -196,31 +198,30 @@ namespace chk
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-			dbg::print(" - Create the shader program");
+			// - Create the shader program
 			gl.shader_program = glCreateProgram();
 
-			dbg::print(" - Compile the vertex shader");
+			// - Compile the vertex shader
 			gl.vert_shader = glCreateShader(GL_VERTEX_SHADER);
 			glShaderSource(gl.vert_shader, 1, &vert_shader_source, nullptr);
 			glCompileShader(gl.vert_shader);
 			check_shader_compilation(gl.vert_shader);
 
-			dbg::print(" - Compile the fragment shader");
+			// - Compile the fragment shader
 			gl.frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
 			glShaderSource(gl.frag_shader, 1, &frag_shader_source, nullptr);
 			glCompileShader(gl.frag_shader);
 			check_shader_compilation(gl.frag_shader);
 
-			dbg::print(" - Link both shaders with the program");
+			//  - Link both shaders with the program
 			glAttachShader(gl.shader_program, gl.vert_shader);
 			glAttachShader(gl.shader_program, gl.frag_shader);
 			glLinkProgram(gl.shader_program);
 			check_shader_linking(gl.shader_program);
 
-			dbg::print(" - We're done.");
+			//  - We're done.
 			glUseProgram(gl.shader_program);
 
-			// Get the Texture location and stuff
 			gl.texture_location = glGetUniformLocation(gl.shader_program, "tex");
 			gl.texture_unit = 0;
 
@@ -242,43 +243,28 @@ namespace chk
 
 			auto format = GL_RGBA;
 			if (bitmap.bpp() != 4)
-			{
 				dbg::error("Unsupported bitmap bpp of {}!", bitmap.bpp());
-			}
 
-			// dbg::print(" - Updating the texture with one of size {} at pixel {} of size {}", bitmap.size(), static_cast<void*>(bitmap.memory()), bitmap.memory_size());
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap.w(), bitmap.h(), 0, format, GL_UNSIGNED_BYTE, reinterpret_cast<const void *>(bitmap.memory()));
-			// dbg::print(" - Done.");
 		}
 
 		void draw(OpenGL &gl, const Bitmap &bitmap)
 		{
 			if (!gl.shader_program)
-			{
 				dbg::warn("Missing shader program!");
-			}
-			// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			// dbg::print(" - Update the texture with the new data");
 			update_tex(gl, bitmap);
 
-			// dbg::print(" - Clear the screen");
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			// dbg::print(" - Bind the shader");
 			glUseProgram(gl.shader_program);
 
-			// dbg::print(" - Bind the texture");
 			glActiveTexture(GL_TEXTURE0 + gl.texture_unit);
 			glBindTexture(GL_TEXTURE_2D, gl.texture);
 			glUniform1i(gl.texture_location, gl.texture_unit);
 
-			// dbg::print(" - Bind the VAO and draw the fullscreen quad");
 			glBindVertexArray(gl.vao);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			glBindVertexArray(0);
-
-			// dbg::print(" - Done with the frame");
 		}
 	}
 }

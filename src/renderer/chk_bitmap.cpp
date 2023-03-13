@@ -1,6 +1,8 @@
 #include "chk_bitmap.h"
 #include "../common/chk_colors.h"
 
+#include <algorithm>
+
 namespace chk
 {
 	Bitmap::~Bitmap()
@@ -36,17 +38,11 @@ namespace chk
 
 		m_memory = new uint8_t[memory_size];
 
-		// Draw a debug gradient
-		// dbg::print("Drawing debug rect from [0, 0] to {}", m_size);
-		uint8_t *row = m_memory;
-		for (int y = 0; y < m_size.y; ++y)
-		{
-			uint32_t *pixel = reinterpret_cast<uint32_t *>(row);
-			for (int x = 0; x < m_size.x; ++x)
-			{
-				*pixel++ = colors::packed_rgba(static_cast<uint8_t>(x), static_cast<uint8_t>(y), 0, 255);
-			}
-			row += m_stride;
-		}
+		clear();
+	}
+
+	void Bitmap::clear()
+	{
+		memset(m_memory, 0, memory_size());
 	}
 }

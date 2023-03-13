@@ -4,6 +4,7 @@
 #include "common/chk_common.h"
 #include "common/chk_dbg.h"
 #include "common/chk_math.h"
+#include "common/chk_path.h"
 #include "window/chk_window.h"
 
 #include "renderer/chk_renderer.h"

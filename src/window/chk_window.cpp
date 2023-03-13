@@ -39,6 +39,8 @@ namespace chk
 			internal_release_window();
 		}
 
+		glfwSetWindowSizeLimits(m_handle, 100, 100, GLFW_DONT_CARE, GLFW_DONT_CARE);
+
 		glfwSetWindowUserPointer(m_handle, this);
 		glfwSetKeyCallback(m_handle, s_cb_keyfun);
 		glfwSetCharCallback(m_handle, s_cb_charfun);
@@ -65,14 +67,11 @@ namespace chk
 		if (m_uses_opengl)
 		{
 			glfwMakeContextCurrent(m_handle);
+
 			if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress)))
-			{
 				dbg::error("Failed to initialize OpenGL!");
-			}
 			else
-			{
 				dbg::print("Loaded OpenGL");
-			}
 		}
 
 		m_is_running = true;
@@ -81,37 +80,26 @@ namespace chk
 	Window::~Window()
 	{
 		if (m_handle)
-		{
 			internal_release_window();
-			m_handle = nullptr;
-		}
+
+		m_handle = nullptr;
 	}
 
-	bool Window::recreate(bool uses_opengl)
+	void Window::recreate(bool uses_opengl)
 	{
-		try
-		{
-			glm::ivec2 saved_size = m_size;
-			std::string saved_caption = m_caption;
+		glm::ivec2 saved_size = m_size;
+		std::string saved_caption = m_caption;
 
-			dbg::print("Recreating the window {} an OpenGL context...", uses_opengl ? "with" : "without");
-			this->~Window();
-			new (&*this) Window(saved_size, saved_caption, uses_opengl);
-			return true;
-		}
-		catch (const std::exception &e)
-		{
-			dbg::error("{}", e.what());
-			return false;
-		}
+		dbg::print("Recreating the window {} an OpenGL context...", uses_opengl ? "with" : "without");
+		this->~Window();
+		new (&*this) Window(saved_size, saved_caption, uses_opengl);
 	}
 
 	bool Window::show()
 	{
 		if (!m_handle)
-		{
 			return false;
-		}
+
 		glfwShowWindow(m_handle);
 		return true;
 	}
@@ -123,29 +111,30 @@ namespace chk
 		glfwSetTime(0.0);
 		m_current_time = m_last_time = glfwGetTime();
 		if (!show())
-		{
 			return false;
-		}
+
 		while (!glfwWindowShouldClose(m_handle))
 		{
 			glfwPollEvents();
+			if (!is_running())
+				return false;
+
 			m_current_time = glfwGetTime();
-			m_delta_time = (m_current_time - m_last_time) * 1000.0f;
+			m_delta_time = m_current_time - m_last_time;
+			m_delta_ms = m_delta_time * 1000.0;
 			m_last_time = m_current_time;
 
-			std::string title;
-			fmt::format_to(std::back_inserter(title), "{} :: dt: {:.4f} :: fps: {:.2f}", m_caption, m_delta_time, 1000.0f / m_delta_time);
-
-			glfwSetWindowTitle(m_handle, title.c_str());
-
-			if (!is_running())
+			m_elapsed_timer += m_delta_time;
+			if (m_elapsed_timer >= 1.0)
 			{
-				return false;
+				std::string title;
+				fmt::format_to(std::back_inserter(title), "{} :: dt: {:.8f} :: fps: {:.2f}", m_caption, m_delta_ms, 1000.0 / m_delta_ms);
+				glfwSetWindowTitle(m_handle, title.c_str());
+				m_elapsed_timer -= 1.0;
 			}
+
 			if (m_frame_cb)
-			{
 				m_frame_cb();
-			}
 
 			m_size_changed = false;
 			m_fb_size_changed = false;
@@ -160,16 +149,19 @@ namespace chk
 
 	bool Window::swap_buffers()
 	{
-		if (!uses_opengl())
-		{
+		if (is_minimized())
 			return false;
-		}
+
+		if (!uses_opengl())
+			return false;
+
 		glfwSwapBuffers(m_handle);
 		return true;
 	}
 
 	// GLFW Callbacks
 #define CHK_GET_WIN auto win = reinterpret_cast<Window *>(glfwGetWindowUserPointer(handle))
+
 	void Window::s_cb_keyfun(GLFWwindow *handle, int key, int scancode, int action, int mods)
 	{
 	}
@@ -180,24 +172,28 @@ namespace chk
 	void Window::s_cb_cursorenterfun(GLFWwindow *handle, int entered) {}
 	void Window::s_cb_mousebuttonfun(GLFWwindow *handle, int button, int action, int mods) {}
 	void Window::s_cb_scrollfun(GLFWwindow *handle, double dx, double dy) {}
+
 	void Window::s_cb_windowposfun(GLFWwindow *handle, int x, int y)
 	{
 		CHK_GET_WIN;
 		win->m_pos = {x, y};
 		win->m_pos_changed = true;
 	}
+
 	void Window::s_cb_windowsizefun(GLFWwindow *handle, int width, int height)
 	{
 		CHK_GET_WIN;
 		win->m_size = {width, height};
 		win->m_size_changed = true;
 	}
+
 	void Window::s_cb_framebuffersizefun(GLFWwindow *handle, int width, int height)
 	{
 		CHK_GET_WIN;
 		win->m_fb_size = {width, height};
 		win->m_fb_size_changed = true;
 	}
+
 	void Window::s_cb_windowrefreshfun(GLFWwindow *handle)
 	{
 		CHK_GET_WIN;
@@ -206,27 +202,32 @@ namespace chk
 			win->m_frame_cb();
 		}
 	}
+
 	void Window::s_cb_windowclosefun(GLFWwindow *handle)
 	{
 		CHK_GET_WIN;
 		win->m_is_running = false;
 	}
+
 	void Window::s_cb_windowiconifyfun(GLFWwindow *handle, int minimized)
 	{
 		CHK_GET_WIN;
 		win->m_is_minimized = !!(minimized);
 	}
+
 	void Window::s_cb_windowmaximizefun(GLFWwindow *handle, int maximized)
 	{
 		CHK_GET_WIN;
 		win->m_is_maximized = !!(maximized);
 	}
+
 	void Window::s_cb_windowfocusfun(GLFWwindow *handle, int focused)
 	{
 		CHK_GET_WIN;
 		win->m_is_focused = !!(focused);
 		win->m_focus_changed = true;
 	}
+
 	void Window::s_cb_windowcontentscalefun(GLFWwindow *handle, float dpi_x, float dpi_y)
 	{
 		CHK_GET_WIN;
@@ -239,22 +240,18 @@ namespace chk
 	void internal_register_window()
 	{
 		if (!g_internal_window_count && !glfwInit())
-		{
 			dbg::error("Failed to initialize GLFW!");
-		}
+
 		++g_internal_window_count;
 	}
 
 	void internal_release_window()
 	{
 		--g_internal_window_count;
+
 		if (!g_internal_window_count)
-		{
 			glfwTerminate();
-		}
 		else if (g_internal_window_count < 0)
-		{
 			dbg::error("Releasing a window when there are {} registered!", g_internal_window_count);
-		}
 	}
 }

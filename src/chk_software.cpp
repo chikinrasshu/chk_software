@@ -4,6 +4,9 @@ using namespace chk;
 
 int main()
 {
+	auto exe_path = path::to_file("xDDD/xdd.txt");
+	dbg::print("exe_path is '{}'", exe_path);
+
 	auto window = Window({800, 600}, "chk_software renderer");
 	auto renderer = SoftRenderer(window);
 	auto command_list = CommandList();

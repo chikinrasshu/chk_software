@@ -14,3 +14,6 @@ add_subdirectory("fmt")
 set(GLAD_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glad/")
 add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
 glad_add_library(glad_gl_core_41 REPRODUCIBLE API gl:core=4.1)
+
+# Add whereami
+add_subdirectory("whereami")
