@@ -34,6 +34,7 @@ add_executable(
   "src/common/chk_common.h"
   "src/common/chk_dbg.cpp"
   "src/common/chk_dbg.h"
+  "src/common/chk_math.cpp"
   "src/common/chk_math.h"
   "src/common/chk_path.cpp"
   "src/common/chk_path.h"
@@ -48,7 +49,8 @@ add_executable(
   "src/soft/chk_opengl.h"
   "src/soft/chk_opengl.cpp")
 
-target_link_libraries(chk_software glm::glm fmt::fmt glfw glad_gl_core_41 whereami)
+target_link_libraries(chk_software glm::glm fmt::fmt glfw glad_gl_core_41
+                      whereami)
 target_compile_features(chk_software PUBLIC cxx_std_17)
 
 # TODO: Add tests and install targets if needed.

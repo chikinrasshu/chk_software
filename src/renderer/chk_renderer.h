@@ -19,7 +19,19 @@ namespace chk
 		virtual void render(CommandList &command_list) = 0;
 		virtual void present() = 0;
 
+		virtual void set_internal_resolution(ivec2 resolution) = 0;
+		virtual void reset_internal_resolution() = 0;
+
+		void set_clear_color(vec4 &new_clear_color) { m_clear_color = new_clear_color; }
+		const vec4 &clear_color() const { return m_clear_color; }
+
 	protected:
 		Window &m_window;
+
+		bool m_internal_resolution_set{false};
+		ivec2 m_internal_resolution{0, 0};
+		ivec2 m_last_internal_resolution{0, 0};
+
+		vec4 m_clear_color{0, 0, 0, 1};
 	};
 }

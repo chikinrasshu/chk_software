@@ -19,6 +19,9 @@ namespace chk
 		void render(CommandList &command_list);
 		void present();
 
+		void set_internal_resolution(ivec2 resolution);
+		void reset_internal_resolution();
+
 		// Rendering
 		void draw_line(LineCommand *command);
 		void draw_triangle(TriangleCommand *command);

@@ -17,7 +17,7 @@ namespace chk
 
 		// Helpers
 		void resize(const ivec2 &size);
-		void clear();
+		void clear(uint32_t value = 0);
 
 		// Getters
 		int w() const { return m_size.x; }

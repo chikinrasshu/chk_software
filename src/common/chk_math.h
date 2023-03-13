@@ -45,3 +45,9 @@ struct fmt::formatter<glm::vec<L, T, Q>>
 		return fmt::format_to(out, "]");
 	}
 };
+
+// Common math operations
+namespace chk
+{
+	vec2 scale_keep_aspect(vec2 src, vec2 dst);
+}

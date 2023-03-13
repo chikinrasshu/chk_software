@@ -27,8 +27,7 @@ namespace chk
 
 			void main()
 			{
-				vec3 uvdebug = vec3(fragTexCoord, 0);
-				fragColor = vec4(texture(tex, fragTexCoord).rgb + 0.1*uvdebug, 1);
+				fragColor = vec4(texture(tex, fragTexCoord).rgb, 1);
 			}
 		)"""";
 
