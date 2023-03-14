@@ -8,26 +8,27 @@ namespace chk
 
 		const char *vert_shader_source = R""""(
 			#version 410 core
-			layout (location = 0) in vec2 position;
-			layout (location = 1) in vec2 texCoord;
-			out vec2 fragTexCoord;
+			layout (location = 0) in vec2 pos;
+			layout (location = 1) in vec2 uv;
+			out vec2 frag_uv;
 
 			void main()
 			{
-				gl_Position = vec4(position, 0.0, 1.0);
-				fragTexCoord = texCoord;
+				gl_Position = vec4(pos, 0.0, 1.0);
+				frag_uv = uv;
 			}
 		)"""";
 
 		const char *frag_shader_source = R""""(
 			#version 410 core
 			uniform sampler2D tex;
-			in vec2 fragTexCoord;
-			out vec4 fragColor;
+			in vec2 frag_uv;
+			out vec4 out_col;
 
 			void main()
 			{
-				fragColor = vec4(texture(tex, fragTexCoord).rgb, 1);
+				vec4 tex_sample = texture(tex, frag_uv);
+				out_col = vec4((tex_sample.rg + frag_uv) / 2, tex_sample.b, tex_sample.a);
 			}
 		)"""";
 
@@ -229,7 +230,10 @@ namespace chk
 
 		void update_viewport(OpenGL &gl, const ivec2 &pos, const ivec2 &size)
 		{
+			// dbg::log("OpenGL", "Setting viewport to {} {}", pos, size);
 			glViewport(pos.x, pos.y, size.x, size.y);
+			gl.viewport_pos = pos;
+			gl.viewport_size = size;
 		}
 
 		void update_tex(OpenGL &gl, const Bitmap &bitmap)
@@ -249,6 +253,7 @@ namespace chk
 
 		void draw(OpenGL &gl, const Bitmap &bitmap)
 		{
+			// dbg::print("Drawing the frame of size {}", bitmap.size());
 			if (!gl.shader_program)
 				dbg::warn("Missing shader program!");
 
@@ -264,6 +269,15 @@ namespace chk
 
 			glBindVertexArray(gl.vao);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
+
+		void clear_region(OpenGL &gl, const ivec2 &pos, const ivec2 &size)
+		{
+			auto &saved_pos = gl.viewport_pos;
+			auto &saved_size = gl.viewport_size;
+			update_viewport(gl, pos, size);
+			glClear(GL_COLOR_BUFFER_BIT);
+			update_viewport(gl, saved_pos, saved_size);
 		}
 	}
 }

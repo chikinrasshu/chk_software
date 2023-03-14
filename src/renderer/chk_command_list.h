@@ -10,6 +10,7 @@ namespace chk
 {
 	enum class GraphicsCommandKind
 	{
+		Clear,
 		Line,
 		Triangle,
 		Rect,
@@ -25,6 +26,13 @@ namespace chk
 
 		GraphicsCommandKind kind;
 		vec4 color;
+	};
+
+	struct ClearCommand : GraphicsCommand
+	{
+		ClearCommand(const vec4 &color = {1, 1, 1, 1})
+			: GraphicsCommand{GraphicsCommandKind::Clear, color} {}
+		~ClearCommand() = default;
 	};
 
 	struct LineCommand : GraphicsCommand
@@ -89,6 +97,7 @@ namespace chk
 		~CommandList() = default;
 		CHK_NON_COPYABLE_NON_MOVABLE(CommandList);
 
+		void push_clear(const vec4 &c = {0, 0, 0, 1}) { m_commands.emplace_back(std::make_unique<ClearCommand>(c)); }
 		void push_line(const vec2 &p0, const vec2 &p1, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<LineCommand>(p0, p1, c)); }
 		void push_triangle(const vec2 &p0, const vec2 &p1, const vec2 &p2, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<TriangleCommand>(p0, p1, p2, c)); }
 		void push_rect(const vec2 &pos, const vec2 &size, const vec4 c = {1, 1, 1, 1}) { m_commands.emplace_back(std::make_unique<RectCommand>(pos, size, c)); }

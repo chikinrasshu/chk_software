@@ -23,6 +23,7 @@ namespace chk
 		void reset_internal_resolution();
 
 		// Rendering
+		void draw_clear(ClearCommand *command);
 		void draw_line(LineCommand *command);
 		void draw_triangle(TriangleCommand *command);
 		void draw_rect(RectCommand *command);

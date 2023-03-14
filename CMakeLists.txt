@@ -28,6 +28,7 @@ add_executable(
   "cpp.hint"
   "src/chk_software.cpp"
   "src/chk_software.h"
+  "src/common/chk_arena.h"
   "src/common/chk_colors.cpp"
   "src/common/chk_colors.h"
   "src/common/chk_common.cpp"

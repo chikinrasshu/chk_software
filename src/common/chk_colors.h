@@ -24,6 +24,7 @@ namespace chk
 		vec4 unpacked_rgba(uint32_t c);
 		vec4 unpacked_bgra(uint32_t c);
 
+		extern vec4 transparent;
 		extern vec4 black;
 		extern vec4 dark_gray;
 		extern vec4 red;

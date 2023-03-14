@@ -1,6 +1,6 @@
 #include "chk_soft_renderer.h"
-#include "chk_opengl.h"
 #include "../common/chk_colors.h"
+#include "chk_opengl.h"
 
 namespace chk
 {
@@ -15,37 +15,27 @@ namespace chk
 	void SoftRenderer::begin_frame()
 	{
 		// Resize the render target
-		auto target_size = m_internal_resolution;
-		auto size_changed = false;
-		if (!m_internal_resolution_set)
+		if (!m_internal_resolution_set && m_window.fb_size_changed() && !m_window.is_minimized())
 		{
-			target_size = m_window.fb_size();
-			if (m_window.fb_size_changed())
-			{
-				dbg::print("Internal resolution is NOT set and changed!");
-				size_changed = true;
-			}
+			m_render_target.resize(m_window.fb_size());
 		}
-		else
-		{
-			if (m_internal_resolution.x != m_last_internal_resolution.x || m_internal_resolution.y != m_last_internal_resolution.y)
-			{
-				dbg::print("Internal resolution is set and changed!");
-				size_changed = true;
-				m_last_internal_resolution = m_internal_resolution;
-			}
-		}
-
-		if (size_changed && !m_window.is_minimized())
-		{
-			m_render_target.resize(target_size);
-		}
-
-		// Set the viewport
-		opengl::update_viewport(m_gl, {0, 0}, m_window.fb_size());
 
 		// Clear the render target
-		// m_render_target.clear(colors::packed_rgba(clear_color()));
+		if (m_window.fb_size_changed() && !m_window.is_minimized())
+		{
+			opengl::update_viewport(m_gl, {0, 0}, m_window.fb_size());
+		}
+
+		// If the internal resolution is set, clear the whole window
+		if (m_internal_resolution_set)
+		{
+			opengl::clear_region(m_gl, {0, 0}, {m_window.fb_size()});
+
+			// Set the viewport to the scaled original resolution keeping aspect ratio
+			auto scaled = scale_keep_aspect(m_render_target.size(), m_window.fb_size());
+			auto tl = ivec2(m_window.fb_size() - scaled) / 2;
+			opengl::update_viewport(m_gl, tl, scaled);
+		}
 	}
 
 	void SoftRenderer::end_frame()
@@ -55,13 +45,19 @@ namespace chk
 	void SoftRenderer::render(CommandList &command_list)
 	{
 		// Go though every kind of command, and render them
+		int i = 0;
 		for (auto &command : command_list)
 		{
 			if (!command)
 				continue;
 
+			// dbg::print("Drawing command[{}] at address {}", i++, fmt::ptr(command));
+
 			switch (command->kind)
 			{
+			case GraphicsCommandKind::Clear:
+				draw_clear(dynamic_cast<ClearCommand *>(command.get()));
+				break;
 			case GraphicsCommandKind::Line:
 				draw_line(dynamic_cast<LineCommand *>(command.get()));
 				break;
@@ -98,47 +94,57 @@ namespace chk
 		dbg::print("Locking internal resolution to {}", resolution);
 		m_internal_resolution_set = true;
 		m_internal_resolution = resolution;
+		m_render_target.resize(resolution);
 	}
 
 	void SoftRenderer::reset_internal_resolution()
 	{
 		dbg::print("Unlocking internal resolution");
 		m_internal_resolution_set = false;
+		m_render_target.resize(m_window.fb_size());
 	}
 
 	// Rendering
+	void SoftRenderer::draw_clear(ClearCommand *command)
+	{
+		m_render_target.clear(colors::packed_rgba(command->color));
+	}
+
 	void SoftRenderer::draw_line(LineCommand *command)
 	{
-		// Variables
-		int x0 = command->p0.x;
-		int y0 = command->p0.y;
-		int x1 = command->p1.x;
-		int y1 = command->p1.y;
-		int width = m_render_target.w();
-		int height = m_render_target.h();
-		uint32_t color = colors::packed_rgba(command->color.r, command->color.g, command->color.b, command->color.a);
+		auto packed_color = colors::packed_rgba(command->color);
+		auto x0 = static_cast<int>(command->p0.x);
+		auto y0 = static_cast<int>(command->p0.y);
+		auto x1 = static_cast<int>(command->p1.x);
+		auto y1 = static_cast<int>(command->p1.y);
+		auto width = m_render_target.w();
+		auto height = m_render_target.h();
 
 		// Clip line endpoints to buffer boundaries
-		if (x0 < 0 || x0 >= width || y0 < 0 || y0 >= height || x1 < 0 || x1 >= width || y1 < 0 || y1 >= height)
+		if ((x0 < 0 || x0 >= width || y0 < 0 || y0 >= height) && (x1 < 0 || x1 >= width || y1 < 0 || y1 >= height))
 		{
 			// Line is completely outside buffer, return without drawing anything
 			return;
 		}
+
 		if (x0 < 0)
 		{
 			y0 += (y1 - y0) * (-x0) / (x1 - x0);
 			x0 = 0;
 		}
+
 		if (y0 < 0)
 		{
 			x0 += (x1 - x0) * (-y0) / (y1 - y0);
 			y0 = 0;
 		}
+
 		if (x1 >= width)
 		{
 			y1 -= (y1 - y0) * (x1 - width + 1) / (x1 - x0);
 			x1 = width - 1;
 		}
+
 		if (y1 >= height)
 		{
 			x1 -= (x1 - x0) * (y1 - height + 1) / (y1 - y0);
@@ -152,12 +158,13 @@ namespace chk
 		int sy = (y0 < y1) ? 1 : -1;
 		int err = dx - dy;
 
-		auto buffer = m_render_target.memory();
+		uint8_t *ptr = m_render_target.memory();
 		while (true)
 		{
 			int index = (y0 * width + x0) * 4;
-			auto pixel = reinterpret_cast<uint32_t *>(buffer + index);
-			*pixel = color;
+
+			auto pixel = reinterpret_cast<uint32_t *>(ptr + index);
+			*pixel = packed_color;
 
 			if (x0 == x1 && y0 == y1)
 			{

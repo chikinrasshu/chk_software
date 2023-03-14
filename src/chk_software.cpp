@@ -18,8 +18,10 @@ int main()
 			renderer.begin_frame();
 
 			command_list.clear();
+			command_list.push_clear(colors::transparent);
 
-			command_list.push_line({5, 7}, {16, 3}, colors::pink);
+			command_list.push_line({5, 7}, {48, 26}, colors::yellow);
+			command_list.push_line({16, 4}, {2, 48}, colors::red);
 			// command_list.push_rect({32, 7}, {8, 12}, colors::red);
 
 			renderer.render(command_list);

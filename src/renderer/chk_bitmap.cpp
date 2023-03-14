@@ -43,24 +43,7 @@ namespace chk
 
 	void Bitmap::clear(uint32_t value)
 	{
-		// memset(m_memory, value, memory_size());
-
-		// Draw a test pattern
-		// auto unpacked = colors::unpacked_rgba(value);
-		// dbg::print("Clearing the bitmap of size {} with color {}", m_size, unpacked);
-
-		uint8_t *ptr = m_memory;
-		for (int y = 0; y < m_size.y; ++y)
-		{
-			uint32_t *pixel = reinterpret_cast<uint32_t *>(ptr);
-
-			float g = static_cast<float>(y) / m_size.y;
-			for (int x = 0; x < m_size.x; ++x)
-			{
-				float r = static_cast<float>(x) / m_size.x;
-				*pixel++ = colors::packed_rgba({r, g, 0, 1});
-			}
-			ptr += m_stride;
-		}
+		memset(m_memory, value, memory_size());
 	}
+
 }

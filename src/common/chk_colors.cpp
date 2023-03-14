@@ -4,6 +4,7 @@ namespace chk
 {
 	namespace colors
 	{
+		vec4 transparent = rgba(0, 0, 0, 0);
 		vec4 black = rgba(0, 0, 0);
 		vec4 dark_gray = rgba(87, 87, 87);
 		vec4 red = rgba(173, 35, 35);
@@ -49,11 +50,36 @@ namespace chk
 							   static_cast<uint8_t>(a / 255.0f));
 		}
 
-		uint32_t packed_bgra(vec3 c, float a) { return packed_bgra(c.r, c.g, c.b, a); }
-		uint32_t packed_rgba(vec3 c, float a) { return packed_rgba(c.r, c.g, c.b, a); }
+		uint32_t packed_bgra(vec3 c, float a)
+		{
+			c *= 255;
+			return packed_bgra(static_cast<uint8_t>(c.r),
+							   static_cast<uint8_t>(c.g),
+							   static_cast<uint8_t>(c.b),
+							   static_cast<uint8_t>(a * 255.0f));
+		}
+		uint32_t packed_rgba(vec3 c, float a)
+		{
+			c *= 255.0f;
+			return packed_rgba(static_cast<uint8_t>(c.r),
+							   static_cast<uint8_t>(c.g),
+							   static_cast<uint8_t>(c.b),
+							   static_cast<uint8_t>(a * 255.0f));
+		}
 
-		uint32_t packed_bgra(vec4 c) { return packed_bgra(c.r, c.g, c.b, c.a); }
-		uint32_t packed_rgba(vec4 c) { return packed_rgba(c.r, c.g, c.b, c.a); }
+		uint32_t packed_bgra(vec4 c)
+		{
+			c *= 255.0f;
+			return packed_bgra(static_cast<uint8_t>(c.r),
+							   static_cast<uint8_t>(c.g),
+							   static_cast<uint8_t>(c.b),
+							   static_cast<uint8_t>(c.a));
+		}
+		uint32_t packed_rgba(vec4 c)
+		{
+			c *= 255.0f;
+			return packed_rgba(static_cast<uint8_t>(c.r), static_cast<uint8_t>(c.g), static_cast<uint8_t>(c.b), static_cast<uint8_t>(c.a));
+		}
 
 		vec4 unpacked_rgba(uint32_t c)
 		{
